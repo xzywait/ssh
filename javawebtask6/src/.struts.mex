@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Struts2Diagram version="2.0">
+  <package name="default" location="165,10" size="560,350">
+    <action name="BookAction-save" location="310,47" size="150,62">
+      <result name="save-success">
+        <resourceEdge source="save-success" routing="0" target="index.jsp" />
+      </result>
+      <result name="update-success">
+        <resourceEdge source="update-success" routing="0" target="index.jsp" />
+      </result>
+    </action>
+    <action name="BookAction-delete" location="310,162" size="150,41">
+      <result name="delete-success">
+        <resourceEdge source="delete-success" routing="0" target="index.jsp" />
+      </result>
+    </action>
+    <action name="BookAction-query" location="310,267" size="150,41">
+      <result name="query-success">
+        <resourceEdge source="query-success" routing="0" target="edit.jsp" />
+      </result>
+    </action>
+    <action name="BookAction-list" location="65,267" size="150,41">
+      <result name="list-success">
+        <resourceEdge source="list-success" routing="0" target="index.jsp" />
+      </result>
+    </action>
+  </package>
+  <webResource name="index.jsp" path="/index.jsp" location="10,240" size="150,55" />
+  <webResource name="edit.jsp" path="/edit.jsp" location="500,415" size="150,55" />
+</Struts2Diagram>
+

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	 http://www.springframework.org/schema/aop 
+	 http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+	 http://www.springframework.org/schema/tx
+	 http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+	 
+	 ">
+
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<!-- 连接属性 -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql:///library?characterEncoding=utf8"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+
+		<!-- 连接启动初始值 -->
+		<property name="initialSize" value="1"></property>
+		<!-- 连接池最大值 -->
+		<property name="maxActive" value="500"></property>
+		<!-- 最大空闲值 -->
+		<property name="maxIdle" value="2"></property>
+		<!-- 最小空闲值 -->
+		<property name="minIdle" value="1"></property>
+	</bean>
+	<!-- 配置spring回话工厂 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 配置hibernate配置文件位置 -->
+		<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+		<!-- 配置hibernate映射文件位置 -->
+		<property name="mappingLocations" value="classpath:vo/*.xml"></property>
+
+	</bean>
+	<!-- 配置action bean-->
+	<bean id="bookEdit" class="action.BookEditAction" scope="prototype">
+		<property name="bookService" ref="bookService"></property>
+	</bean>
+	<bean id="bookList" class="action.BookListAction" scope="prototype">
+		<property name="bookService" ref="bookService"></property>
+	</bean>
+	<bean id="bookDelete" class="action.BookDeleteAction" scope="prototype">
+		<property name="bookService" ref="bookService"></property>
+	</bean>
+	<bean id="bookQuery" class="action.BookQueryAction" scope="prototype">
+		<property name="bookService" ref="bookService"></property>
+	</bean>
+	<!-- 配置Service层 bean-->
+	<bean id="bookService" class="service.BookService">
+		<property name="bookDao" ref="bookDao"></property>
+	</bean>
+	<!-- 配置DAO层 bean-->
+	<bean id="bookDao" class="dao.impl.BookDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- 配置spring事务管理器-->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- 配置事务传播方式 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"></tx:method>
+			<tx:method name="findByName" read-only="true"></tx:method>
+			<tx:method name="*" propagation="REQUIRED"></tx:method>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 配置切面 -->
+	<aop:config>
+		<aop:pointcut id="empService" expression="execution(* service.*.*(..))" />
+		<aop:advisor pointcut-ref="empService" advice-ref="txAdvice" />
+	</aop:config>
+</beans>
